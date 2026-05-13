@@ -1,0 +1,9 @@
+{
+  "pedidos": [
+    {
+      "id_pedido": 1,
+      "nombre_producto": "MacBook Air",
+      "estado": "PENDIENTE"
+    }
+  ]
+}

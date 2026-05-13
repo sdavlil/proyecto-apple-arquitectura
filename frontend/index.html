@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestor de Pedidos</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <h1>Gestor de Pedidos Apple</h1>
+
+    <!-- FORMULARIO -->
+    <section class="form">
+        <input type="text" id="nombre_producto" placeholder="Ej: iPhone 15">
+        <button onclick="crearPedido()">Crear pedido</button>
+    </section>
+
+    <!-- ERROR -->
+    <div id="error" class="error"></div>
+
+    <!-- TABLERO -->
+    <section class="board">
+
+        <div class="col">
+            <h2>PENDIENTE</h2>
+            <div id="PENDIENTE" class="list"></div>
+        </div>
+
+        <div class="col">
+            <h2>PROCESANDO</h2>
+            <div id="PROCESANDO" class="list"></div>
+        </div>
+
+        <div class="col">
+            <h2>ENTREGADO</h2>
+            <div id="ENTREGADO" class="list"></div>
+        </div>
+
+    </section>
+
+    <script src="app.js"></script>
+</body>
+</html>
