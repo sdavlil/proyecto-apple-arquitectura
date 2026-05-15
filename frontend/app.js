@@ -11,11 +11,29 @@ async function cargarPedidos() {
     pedidos.forEach(p => {
         const div = document.createElement("div");
         div.className = "card";
+
+        let botones = "";
+
+        if (p.estado === "PENDIENTE") {
+            botones = `
+                <button onclick="mover(${p.id_pedido}, 'PROCESANDO')">
+                    Procesar
+                </button>
+            `;
+        }
+
+        if (p.estado === "PROCESANDO") {
+            botones = `
+                <button onclick="mover(${p.id_pedido}, 'ENTREGADO')">
+                    Entregar
+                </button>
+            `;
+        }
+
         div.innerHTML = `
-            ${p.nombre_producto}
-            <br>
-            <button onclick="mover(${p.id_pedido}, 'PROCESANDO')">Procesar</button>
-            <button onclick="mover(${p.id_pedido}, 'ENTREGADO')">Entregar</button>
+            <strong>${p.nombre_producto}</strong>
+            <br><br>
+            ${botones}
         `;
 
         document.getElementById(p.estado).appendChild(div);
@@ -25,9 +43,16 @@ async function cargarPedidos() {
 async function crearPedido() {
     const nombre = document.getElementById("nombre_producto").value;
 
+    if (!nombre.trim()) {
+        mostrarError("El nombre del producto es obligatorio");
+        return;
+    }
+
     const res = await fetch(API, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+            "Content-Type": "application/json"
+        },
         body: JSON.stringify({
             nombre_producto: nombre
         })
@@ -40,13 +65,16 @@ async function crearPedido() {
     }
 
     document.getElementById("nombre_producto").value = "";
+
     cargarPedidos();
 }
 
 async function mover(id, estado) {
     const res = await fetch(`${API}/${id}/estado`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+            "Content-Type": "application/json"
+        },
         body: JSON.stringify({
             estado: estado
         })
@@ -63,6 +91,7 @@ async function mover(id, estado) {
 
 function mostrarError(msg) {
     const errorDiv = document.getElementById("error");
+
     errorDiv.innerText = msg;
 
     setTimeout(() => {
