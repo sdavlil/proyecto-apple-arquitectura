@@ -1,8 +1,8 @@
 # gestor_pedidos.py
 
-from pedido import Pedido
-from estado_pedido import EstadoPedido
-from errores import (
+from src.dominio.pedido import Pedido
+from src.dominio.estado_pedido import EstadoPedido
+from src.dominio.errores import (
     ErrorLimiteProcesamientoExcedido,
     ErrorTransicionInvalida,
     ErrorNombrePedidoInvalido
@@ -41,24 +41,12 @@ class GestorPedidos:
         if pedido.estado == EstadoPedido.ENTREGADO:
             raise ErrorTransicionInvalida()
 
+        if pedido.estado == EstadoPedido.PENDIENTE and nuevo_estado == EstadoPedido.ENTREGADO:
+            raise ErrorTransicionInvalida()
+
         if nuevo_estado == EstadoPedido.PROCESANDO:
             if self.pedidos_procesando() >= self.LIMITE_PROCESANDO:
                 raise ErrorLimiteProcesamientoExcedido()
-
-        if (
-            pedido.estado == EstadoPedido.PENDIENTE
-            and nuevo_estado not in [
-                EstadoPedido.PROCESANDO,
-                EstadoPedido.ENTREGADO
-            ]
-        ):
-            raise ErrorTransicionInvalida()
-
-        if (
-            pedido.estado == EstadoPedido.PROCESANDO
-            and nuevo_estado != EstadoPedido.ENTREGADO
-        ):
-            raise ErrorTransicionInvalida()
 
         pedido.estado = nuevo_estado
         return pedido
