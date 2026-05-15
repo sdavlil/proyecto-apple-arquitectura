@@ -1,43 +1,181 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
-    <title>Gestor de Pedidos</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestor de Pedidos Apple</title>
     <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
+    <main class="app-shell">
+        <header class="hero">
+            <div>
+                <p class="eyebrow">Panel de pedidos</p>
+                <h1>Gestor de pedidos Apple</h1>
+                <p class="hero-text">
+                    Administra pedidos Apple con múltiples productos y lo mejor es que puedes conocer los 
+                    estados de entrega
+                </p>
+            </div>
 
-    <h1>Gestor de Pedidos Apple</h1>
+            <div class="hero-card">
+                <span class="hero-number" id="totalPedidos">0</span>
+                <span class="hero-label">pedidos activos</span>
+            </div>
+        </header>
 
-    <!-- FORMULARIO -->
-    <section class="form">
-        <input type="text" id="nombre_producto" placeholder="Ej: iPhone 15">
-        <button onclick="crearPedido()">Crear pedido</button>
-    </section>
+        <nav class="main-menu">
+            <button class="menu-btn active" onclick="mostrarSeccion('productos', this)">
+                Productos
+            </button>
+            <button class="menu-btn" onclick="mostrarSeccion('nuevoPedido', this)">
+                Nuevo pedido
+            </button>
+            <button class="menu-btn" onclick="mostrarSeccion('pedidos', this)">
+                Pedidos
+            </button>
+        </nav>
 
-    <!-- ERROR -->
-    <div id="error" class="error"></div>
+        <section id="seccionProductos" class="page-section active-section">
+            <div class="section-title">
+                <div>
+                    <p class="eyebrow">Catálogo</p>
+                    <h2>Productos disponibles</h2>
+                    <p>
+                        Explora los productos Apple disponibles
+                    </p>
+                </div>
+            </div>
 
-    <!-- TABLERO -->
-    <section class="board">
+            <div id="catalogoProductos" class="catalog-grid"></div>
+        </section>
 
-        <div class="col">
-            <h2>PENDIENTE</h2>
-            <div id="PENDIENTE" class="list"></div>
-        </div>
+        <section id="seccionNuevoPedido" class="page-section">
+            <section class="order-layout" aria-labelledby="tituloCrearPedido">
+                <aside class="order-sidebar">
+                    <div>
+                        <p class="eyebrow">Nuevo pedido</p>
+                        <h2 id="tituloCrearPedido">Crear orden</h2>
+                        <p class="form-help">
+                            Registra el cliente, selecciona productos y confirma el pedido.
+                        </p>
+                    </div>
 
-        <div class="col">
-            <h2>PROCESANDO</h2>
-            <div id="PROCESANDO" class="list"></div>
-        </div>
+                    <div class="sidebar-block">
+                        <label for="cliente">Cliente</label>
+                        <input type="text" id="cliente" placeholder="Ejemplo: Laura Martínez" autocomplete="off">
+                    </div>
 
-        <div class="col">
-            <h2>ENTREGADO</h2>
-            <div id="ENTREGADO" class="list"></div>
-        </div>
+                    <div class="order-summary-box">
+                        <span>Total del pedido</span>
+                        <strong id="totalPedido">US$0</strong>
+                        <p>El total se actualiza automáticamente según las cantidades seleccionadas.</p>
+                    </div>
 
-    </section>
+                    <div class="sidebar-tips">
+                        <h3>Información</h3>
+                        <ul>
+                            <li>Puedes comprar uno o varios productos.</li>
+                            <li>La cantidad mínima para agregar un producto es 1.</li>
+                            <li>Después de crear el pedido podrás procesarlo o eliminarlo.</li>
+                        </ul>
+                    </div>
+
+                    <button class="btn btn-primary btn-full" onclick="crearPedido()">
+                        Crear pedido
+                    </button>
+                </aside>
+
+                <section class="products-panel">
+                    <div class="products-header">
+                        <div>
+                            <p class="eyebrow">Productos</p>
+                            <h2>Seleccionar productos</h2>
+                            <p>Usa el carrusel para ver imágenes y agrega las cantidades del pedido.</p>
+                        </div>
+                    </div>
+
+                    <div id="productosDisponibles" class="products-grid"></div>
+                </section>
+            </section>
+        </section>
+
+        <section id="seccionPedidos" class="page-section">
+            <section class="filters-card">
+                <div>
+                    <p class="eyebrow">Filtros</p>
+                    <h2>Buscar pedidos</h2>
+                    <p>
+                        Puedes filtrar los pedidos por ID o por nombre del cliente.
+                    </p>
+                </div>
+
+                <div class="filters-grid">
+                    <div>
+                        <label for="filtroId">ID del pedido</label>
+                        <input type="number" id="filtroId" placeholder="Ejemplo: 1" oninput="aplicarFiltros()">
+                    </div>
+
+                    <div>
+                        <label for="filtroCliente">Cliente</label>
+                        <input type="text" id="filtroCliente" placeholder="Ejemplo: Laura" oninput="aplicarFiltros()">
+                    </div>
+
+                    <button class="btn btn-secondary" onclick="limpiarFiltros()">
+                        Limpiar filtros
+                    </button>
+                </div>
+            </section>
+
+            <div id="error" class="error" role="alert"></div>
+            <div id="success" class="success" role="status"></div>
+
+            <section class="summary" aria-label="Resumen de pedidos">
+                <article>
+                    <span id="countPendiente">0</span>
+                    <p>Pendientes</p>
+                </article>
+                <article>
+                    <span id="countProcesando">0</span>
+                    <p>Procesando</p>
+                </article>
+                <article>
+                    <span id="countEntregado">0</span>
+                    <p>Entregados</p>
+                </article>
+            </section>
+
+            <section class="board" aria-label="Tablero de estados">
+                <div class="col pendiente">
+                    <div class="col-header">
+                        <h2>Pendiente</h2>
+                        <span id="badgePendiente">0</span>
+                    </div>
+                    <div id="PENDIENTE" class="list"></div>
+                </div>
+
+                <div class="col procesando">
+                    <div class="col-header">
+                        <h2>Procesando</h2>
+                        <span id="badgeProcesando">0</span>
+                    </div>
+                    <div id="PROCESANDO" class="list"></div>
+                </div>
+
+                <div class="col entregado">
+                    <div class="col-header">
+                        <h2>Entregado</h2>
+                        <span id="badgeEntregado">0</span>
+                    </div>
+                    <div id="ENTREGADO" class="list"></div>
+                </div>
+            </section>
+        </section>
+    </main>
 
     <script src="app.js"></script>
 </body>
+
 </html>

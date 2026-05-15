@@ -1,5 +1,6 @@
 # gestor_pedidos.py
 
+
 from src.dominio.pedido import Pedido
 from src.dominio.estado_pedido import EstadoPedido
 from src.dominio.errores import (
@@ -15,14 +16,64 @@ class GestorPedidos:
     def __init__(self):
         self.pedidos = []
 
-    def crear_pedido(self, id_pedido, nombre_producto):
-        if not nombre_producto or not nombre_producto.strip():
-            raise ErrorNombrePedidoInvalido()
+    def crear_pedido(
+        self,
+        id_pedido,
+        nombre_producto=None,
+        precio_producto=0,
+        cliente="",
+        productos=None
+    ):
+        productos = productos or []
+
+        if productos:
+            productos_validos = []
+
+            for producto in productos:
+                nombre = producto.get("nombre", "").strip()
+                precio = producto.get("precio", 0)
+                cantidad = producto.get("cantidad", 1)
+
+                if not nombre:
+                    raise ErrorNombrePedidoInvalido()
+
+                if cantidad <= 0:
+                    cantidad = 1
+
+                productos_validos.append({
+                    "nombre": nombre,
+                    "precio": precio,
+                    "cantidad": cantidad
+                })
+
+            nombre_producto = ", ".join(
+                producto["nombre"] for producto in productos_validos
+            )
+
+            precio_producto = sum(
+                producto["precio"] * producto["cantidad"]
+                for producto in productos_validos
+            )
+
+            productos = productos_validos
+
+        else:
+            if not nombre_producto or not nombre_producto.strip():
+                raise ErrorNombrePedidoInvalido()
+
+            productos = [{
+                "nombre": nombre_producto,
+                "precio": precio_producto,
+                "cantidad": 1
+            }]
 
         pedido = Pedido(
             id_pedido=id_pedido,
             nombre_producto=nombre_producto,
-            estado=EstadoPedido.PENDIENTE
+            estado=EstadoPedido.PENDIENTE,
+            precio_producto=precio_producto,
+            cliente=cliente,
+            productos=productos
         )
 
         self.pedidos.append(pedido)
@@ -57,3 +108,8 @@ class GestorPedidos:
                 return pedido
 
         raise ValueError("Pedido no encontrado")
+
+    def eliminar_pedido(self, id_pedido):
+        pedido = self.buscar_pedido(id_pedido)
+        self.pedidos.remove(pedido)
+        return pedido
