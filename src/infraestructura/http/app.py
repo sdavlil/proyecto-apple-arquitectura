@@ -1,4 +1,5 @@
 from flask import Flask, jsonify, request
+from flask_cors import CORS
 
 from src.dominio.gestor_pedidos import GestorPedidos
 from src.dominio.estado_pedido import EstadoPedido
@@ -8,6 +9,7 @@ from src.aplicacion.mover_pedido import MoverPedido
 from src.aplicacion.obtener_pedidos import ObtenerPedidos
 
 app = Flask(__name__)
+CORS(app)
 
 gestor_pedidos = GestorPedidos()
 
@@ -16,12 +18,13 @@ mover_pedido = MoverPedido(gestor_pedidos)
 obtener_pedidos = ObtenerPedidos(gestor_pedidos)
 
 
+# 🔹 CREAR PEDIDO
 @app.route("/pedidos", methods=["POST"])
 def crear():
     data = request.get_json()
 
     pedido = crear_pedido.ejecutar(
-        id_pedido=data["id_pedido"],
+        id_pedido=len(gestor_pedidos.pedidos) + 1,
         nombre_producto=data["nombre_producto"]
     )
 
@@ -32,6 +35,7 @@ def crear():
     })
 
 
+# 🔹 MOVER ESTADO
 @app.route("/pedidos/<int:id_pedido>/estado", methods=["PUT"])
 def mover(id_pedido):
     data = request.get_json()
@@ -50,6 +54,7 @@ def mover(id_pedido):
     })
 
 
+# 🔹 LISTAR PEDIDOS
 @app.route("/pedidos", methods=["GET"])
 def listar():
     pedidos = obtener_pedidos.ejecutar()
